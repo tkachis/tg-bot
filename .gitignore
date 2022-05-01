@@ -1,0 +1,13 @@
+node_modules/
+cert/*.crt
+build/
+build-dev/
+.idea/
+*.log
+*.sublime-project
+*.sublime-workspace
+.gitmodules
+.DS_Store
+.realsync
+.vscode
+.env
