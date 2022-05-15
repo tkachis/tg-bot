@@ -70,19 +70,19 @@ function getPensionTax(salary) {
 }
 
 function getServiceFee(salary) {
-  if (salary <= 900000) {
-    return 45000;
+  if (salary <= 1000000) {
+    return 50000;
   }
 
-  if (salary <= 1800000) {
-    return 56600;
+  if (salary <= 2000000) {
+    return 65000;
   }
 
-  if (salary <= 2700000) {
-    return 68000;
+  if (salary <= 3000000) {
+    return 80000;
   }
 
-  return 90000;
+  return 95000;
 }
 
 module.exports = {

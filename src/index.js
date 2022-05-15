@@ -1,7 +1,7 @@
 require("dotenv").config();
+const express = require("express");
 const bot = require("./bot");
 const { COMMANDS } = require("./constants");
-const { getMyCommands } = require("./helpers");
 const {
   startHandler,
   helpHandler,
@@ -14,9 +14,8 @@ const {
 } = require("./handlers");
 const { STATES, State } = require("./state");
 
+const app = express();
 const appState = new State();
-
-bot.setMyCommands(getMyCommands());
 
 bot.on("message", (msg) => {
   const text = msg.text;
@@ -64,4 +63,10 @@ bot.on("message", (msg) => {
   }
 
   notFoundHandler(msg);
+});
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, function () {
+  console.log(`Server is running at port ${PORT}`);
 });
