@@ -1,51 +1,34 @@
 const bot = require("./bot");
-const { COMMANDS } = require("./constants");
+const { COMMANDS, DEFAULT_OPTIONS } = require("./constants");
 const {
   getGeneralKeyboardOptions,
   getMilitaryTax,
   getIncomeTax,
   getPensionTax,
   getServiceFee,
+  getMsgWithEscape,
 } = require("./helpers");
 
-function startHandler(msg) {
+function handler(msg, answerKey) {
   const chatId = msg.chat.id;
 
-  const opts = getGeneralKeyboardOptions(msg.message_id);
+  const answer = COMMANDS[answerKey].ANSWER(msg);
+  const answerWithEscape = getMsgWithEscape(answer);
 
-  bot.sendMessage(chatId, COMMANDS.START.ANSWER(msg), opts);
+  bot.sendMessage(chatId, answerWithEscape, DEFAULT_OPTIONS);
 }
 
-function helpHandler(msg) {
+function handlerWithKeyboard(msg, answerKey) {
   const chatId = msg.chat.id;
 
-  const opts = getGeneralKeyboardOptions(msg.message_id);
+  const opts = {
+    ...DEFAULT_OPTIONS,
+    ...getGeneralKeyboardOptions(msg.message_id),
+  };
+  const answer = COMMANDS[answerKey].ANSWER(msg);
+  const answerWithEscape = getMsgWithEscape(answer);
 
-  bot.sendMessage(chatId, COMMANDS.HELP.ANSWER(msg), opts);
-}
-
-function howItWorksHandler(msg) {
-  const chatId = msg.chat.id;
-
-  bot.sendMessage(chatId, COMMANDS.HOW.ANSWER(msg));
-}
-
-function whyHandler(msg) {
-  const chatId = msg.chat.id;
-
-  bot.sendMessage(chatId, COMMANDS.WHY.ANSWER(msg));
-}
-
-function processHandler(msg) {
-  const chatId = msg.chat.id;
-
-  bot.sendMessage(chatId, COMMANDS.PROCESS.ANSWER(msg));
-}
-
-function calcHandler(msg) {
-  const chatId = msg.chat.id;
-
-  bot.sendMessage(chatId, COMMANDS.CALC.ANSWER(msg));
+  bot.sendMessage(chatId, answerWithEscape, opts);
 }
 
 function salaryHandler(msg) {
@@ -63,40 +46,28 @@ function salaryHandler(msg) {
   const serviceFee = getServiceFee(salary);
   const allTaxes = militaryTax + incomeTax + pensionTax;
   const salaryWithoutTaxes = salary - allTaxes;
-  const salaryWithoutTaxesAndService = salaryWithoutTaxes - serviceFee;
+  // const salaryWithoutTaxesAndService = salaryWithoutTaxes - serviceFee;
 
   const incomeTaxText = `Подоходный налог: ${incomeTax} драм.`;
   const pensionTaxText = `Пенсионный взнос: ${pensionTax} драм.`;
   const militaryTaxText = `Взнос в фонд армии: ${militaryTax} драм.`;
   const serviceFeeText = `Стоимость наших услуг: ${serviceFee} драм.`;
-  var yourSalaryText = `Ваш доход, после выплаты всех налогов и оплаты наших услуг: ${salaryWithoutTaxesAndService} драм.`;
+  var yourSalaryText = `Ваш доход, после выплаты всех налогов: ${salaryWithoutTaxes} драм.`;
 
-  if (salaryWithoutTaxesAndService <= 0) {
-    yourSalaryText = "Советую поискать в округе хороший мусорный ящик.";
+  if (salaryWithoutTaxes <= 0) {
+    yourSalaryText = "Советую поискать в округе хороший мусорный ящик 🥹";
   }
 
   bot.sendMessage(
     chatId,
     `${incomeTaxText}\n${pensionTaxText}\n${militaryTaxText}\n${serviceFeeText}\n\n${yourSalaryText}`
   );
+
   return true;
 }
 
-function notFoundHandler(msg) {
-  const chatId = msg.chat.id;
-
-  const opts = getGeneralKeyboardOptions(msg);
-
-  bot.sendMessage(chatId, COMMANDS.NOT_FOUND.ANSWER(), opts);
-}
-
 module.exports = {
-  startHandler,
-  helpHandler,
-  howItWorksHandler,
-  whyHandler,
-  calcHandler,
+  handler,
+  handlerWithKeyboard,
   salaryHandler,
-  processHandler,
-  notFoundHandler,
 };

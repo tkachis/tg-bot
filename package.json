@@ -5,7 +5,8 @@
   "main": "src/index.js",
   "scripts": {
     "dev": "cross-env NODE_ENV=dev nodemon src/index.js",
-    "start": "cross-env NODE_ENV=prod node src/index.js"
+    "start": "cross-env NODE_ENV=prod node src/index.js",
+    "deploy": "git push heroku main"
   },
   "keywords": [],
   "author": "",

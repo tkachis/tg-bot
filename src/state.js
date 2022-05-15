@@ -4,12 +4,26 @@ const STATES = {
 };
 
 class State {
-  constructor(initState = STATES.START) {
-    this.state = initState;
+  _state = {};
+
+  initFor(userId) {
+    if (userId in this._state) {
+      return;
+    }
+
+    this._state[userId] = STATES.START;
   }
 
-  reset() {
-    this.state = STATES.START;
+  resetFor(userId) {
+    this._state[userId] = STATES.START;
+  }
+
+  setFor(userId, newState) {
+    this._state[userId] = newState;
+  }
+
+  getFor(userId) {
+    return this._state[userId];
   }
 }
 

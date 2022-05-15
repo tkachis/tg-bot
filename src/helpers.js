@@ -1,18 +1,35 @@
 const { COMMANDS } = require("./constants");
 
+function getMsgWithEscape(msg) {
+  return msg.replace(/[-.=+?!^$[\](){}\\]/g, "\\$&");
+}
+
+function check(text, key) {
+  return RegExp(`(${COMMANDS[key].COMMAND}|${COMMANDS[key].DESC})`).test(text);
+}
+
 function getGeneralKeyboardOptions(message_id) {
   return {
     reply_to_message_id: message_id,
     reply_markup: {
-      keyboard: [
-        [{ text: COMMANDS.HOW.DESC }],
-        [{ text: COMMANDS.WHY.DESC }],
-        [{ text: COMMANDS.CALC.DESC }],
-        [{ text: COMMANDS.PROCESS.DESC }],
-      ],
+      keyboard: getKeyboardCommands(),
       resize_keyboard: true,
     },
   };
+}
+
+function getKeyboardCommands() {
+  const keyboardCommands = [];
+
+  Object.values(COMMANDS).map((el) => {
+    if (!el.KEYBOARD) {
+      return;
+    }
+
+    keyboardCommands.push([{ text: el.DESC }]);
+  });
+
+  return keyboardCommands;
 }
 
 function getMyCommands() {
@@ -51,43 +68,40 @@ function getMilitaryTax(salary) {
 
 function getIncomeTax(salary) {
   const incomeTaxPrc = 10;
-  return (salary / 100) * incomeTaxPrc;
+  const incomeTax = (salary / 100) * incomeTaxPrc;
+
+  return Math.round(incomeTax);
 }
 
 function getPensionTax(salary) {
-  const maxSalary = 500000;
   const maxPensionTax = 1020000;
+
+  if (salary >= maxPensionTax) {
+    return 74500;
+  }
+
+  const maxSalary = 500000;
   const salaryLessThenMax = salary <= maxSalary;
   const pensionTaxPrc = salaryLessThenMax ? 4.5 : 10;
   const governmentAssistance = salaryLessThenMax ? 0 : 27500;
   const pensionTax = (salary / 100) * pensionTaxPrc - governmentAssistance;
 
-  if (pensionTax <= maxPensionTax) {
-    return pensionTax;
-  }
-
-  return maxPensionTax;
+  return Math.round(pensionTax);
 }
 
 function getServiceFee(salary) {
-  if (salary <= 1000000) {
+  if (salary <= 1020000) {
     return 50000;
+  } else {
+    return 60000;
   }
-
-  if (salary <= 2000000) {
-    return 65000;
-  }
-
-  if (salary <= 3000000) {
-    return 80000;
-  }
-
-  return 95000;
 }
 
 module.exports = {
+  check,
   getMyCommands,
   getGeneralKeyboardOptions,
+  getMsgWithEscape,
   getMilitaryTax,
   getIncomeTax,
   getPensionTax,
